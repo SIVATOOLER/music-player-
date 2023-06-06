@@ -2,55 +2,33 @@ import 'dart:async';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 import "package:on_audio_query/on_audio_query.dart";
 import "package:permission_handler/permission_handler.dart";
-import 'package:awesome_notifications/awesome_notifications.dart';
+//import 'package:awesome_notifications/awesome_notifications.dart';
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
+class NotificationService {
+  static final NotificationService _notificationService =
+      NotificationService._internal();
 
+  factory NotificationService() {
+    return _notificationService;
+  }
+
+  NotificationService._internal();
+
+  init() {}
+  
+}
 //sdbsdjvsjhjhhhhh
 //kjhkjh
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
-static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  static const String name = 'Awesome Notifications - Example App';
-  static const Color mainColor = Color.fromARGB(255, 106, 28, 34);
   @override
   State<MyHomePage> createState() => _MyHomePageState();
-}
-class NotificationController {
-
-  /// Use this method to detect when a new notification or a schedule is created
-  @pragma("vm:entry-point")
-  static Future <void> onNotificationCreatedMethod(ReceivedNotification receivedNotification) async {
-    // Your code goes here
-  }
-
-  /// Use this method to detect every time that a new notification is displayed
-  @pragma("vm:entry-point")
-  static Future <void> onNotificationDisplayedMethod(ReceivedNotification receivedNotification) async {
-    // Your code goes here
-  }
-
-  /// Use this method to detect if the user dismissed a notification
-  @pragma("vm:entry-point")
-  static Future <void> onDismissActionReceivedMethod(ReceivedAction receivedAction) async {
-    // Your code goes here
-  }
-
-  /// Use this method to detect when the user taps on a notification or action button
-  @pragma("vm:entry-point")
-  static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    // Your code goes here
-  if (receivedAction.buttonKeyPressed=="next"){
-   
-  }
-    // Navigate into pages, avoiding to open the notification details page over another details page already opened
-    MyHomePage.navigatorKey.currentState?.pushNamedAndRemoveUntil('/notification-page',
-            (route) => (route.settings.name != '/notification-page') || route.isFirst,
-        arguments: receivedAction);
-  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -69,34 +47,26 @@ class _MyHomePageState extends State<MyHomePage> {
  Duration duration= const Duration();
  Duration position= const Duration();
  bool isSelected=false;
- int progress=0;
+ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+static final NotificationService _notificationService =
+      NotificationService._internal();
+
+ 
+  NotificationDetails? get  platformChannelSpecifics => 
+  NotificationDetails(android: androidPlatformChannelSpecifics);
+  
+  get androidPlatformChannelSpecifics => AndroidNotificationDetails(
+       intIndex as String,   //Required for Android 8.0 or after
+       " channel name", //Required for Android 8.0 or after
+        channelDescription: "String", //Required for Android 8.0 or after
+        importance: Importance.max,
+        priority: Priority.max
+    );
+
 
 @override
 void initState() {
   initialize();
-   AwesomeNotifications().setListeners(
-     onActionReceivedMethod: (ReceivedAction receivedAction) async { 
-        if (receivedAction.buttonKeyPressed=="next"){
-          nextFun();
-            }
-        else if (receivedAction.buttonKeyPressed=="previous"){
-          preFun();
-           }
-         else if(receivedAction.buttonKeyPressed=="pause"){
-          pausefun();notify(intIndex);
-           }
-         else if(receivedAction.buttonKeyPressed=="play"){
-          playerfun(intIndex);
-           }else{
-            MyHomePage.navigatorKey.currentState?.pushNamedAndRemoveUntil('/notification-page',
-            (route) => (route.settings.name != '/notification-page') || route.isFirst,
-        arguments: receivedAction);
-      }}
-        // onActionReceivedMethod:        onActionReceivedMethod,
-        // onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
-        // onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
-        // onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod,
-    );
   super.initState();
   
 }
@@ -109,22 +79,44 @@ void dispose() {
 }
 
 
-
-initialize() async {
-  AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-  if (!isAllowed) {
-    // This is just a basic example. For real apps, you must show some
-    // friendly dialog box before call the request method.
-    // This is very important to not harm the user experience
-    AwesomeNotifications().requestPermissionToSendNotifications();
-  }
-});
+initialize() async { 
      var mStatus =await Permission.storage.request();
      if (mStatus!= PermissionStatus.granted){
       Permission.storage.request();
      // throw "permission revoked";
     }
 }
+
+
+
+Future<void> init() async {
+  final AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('ic_launcher');
+  
+  const AndroidNotificationDetails androidPlatformChannelSpecifics = 
+    AndroidNotificationDetails(
+       " channel id",   //Required for Android 8.0 or after
+       " channel name", //Required for Android 8.0 or after
+        channelDescription: "String", //Required for Android 8.0 or after
+        importance: Importance.max,
+        priority: Priority.max,
+    
+    );
+    const NotificationDetails platformChannelSpecifics = 
+  NotificationDetails(android: androidPlatformChannelSpecifics);
+    final InitializationSettings initializationSettings =
+        InitializationSettings(  
+            android: initializationSettingsAndroid, 
+            iOS: null, 
+            macOS: null);
+            await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        );
+  }
+
+  Future selectNotification(String payload) async {
+      //Handle notification tapped logic here
+   }  
+
 
 searchSong(){
     return Container(
@@ -161,7 +153,7 @@ onsearch(String search ){
        setState(() {
   filterList=songList!.where((user) => 
    user.displayNameWOExt.toString().toLowerCase().contains(search.toLowerCase())).toList();
-      });
+});
       }
     }
 
@@ -189,7 +181,7 @@ onsearch(String search ){
                           bottomPage=false;
                           sName=songList![intIndex].displayNameWOExt;
                           aName=songList![intIndex].artist!;
-
+                          isplaying=true;
                       });
                     }
                   }
@@ -208,9 +200,9 @@ onsearch(String search ){
                ),
              ),
            );
-          },
-        );
-      }
+      },
+    );
+  }
 
  
   SongList() {
@@ -233,14 +225,36 @@ onsearch(String search ){
             itemBuilder: 
       (BuildContext context ,index){
          return InkWell(
-          onTap: ()  {
+          onTap: () async {
+            await flutterLocalNotificationsPlugin.show(
+        intIndex, 
+        "A Notification From My Application",
+        "This notification was sent using Flutter Local Notifcations Package", 
+        platformChannelSpecifics,
+        payload:'fg'
+        );
+            // bool isallowed = await AwesomeNotifications().isNotificationAllowed();
+            // if(!isallowed){
+            //   AwesomeNotifications().requestPermissionToSendNotifications();
+            //   print("eeeeeeeeeeeeee");
+            // }
+            // else{
+            //   print("eeeeeerrrrrrrrrrr");
+            //   AwesomeNotifications().createNotification(content: 
+            //   NotificationContent(id: 123, channelKey: "basic",
+            //   title: sName,
+            //   body:isallowed? "fhhghghg":"fgcc"
+            //   )
+            //   );
+          
+            // }
             setState(() {
               onselect=true;
              // bottomPage=false;
                intIndex=index;
               sName=songList![intIndex].displayNameWOExt;
               aName=songList![intIndex].artist!;
-             isplaying=true;
+               isplaying=true;
              });
              playerfun(index);
           },
@@ -332,14 +346,16 @@ bottom(){
                        IconButton(onPressed: (){preFun();
                        }, icon: Icon(Icons.skip_previous,color: Colors.grey,)),
                        isplaying? IconButton(onPressed: (){pausefun();
-                       
-                       notify(intIndex);
-                       }, icon: Icon(Icons.pause,color: Colors.grey))
+                       setState(() {
+                         isplaying=false;
+                       });}, icon: Icon(Icons.pause,color: Colors.grey))
                        :IconButton(onPressed: (){playerfun(intIndex);
-                       notify(intIndex);
-                      }, icon: Icon(Icons.play_arrow,color: Colors.grey)),        
+                       setState(() {
+                         isplaying=true;
+                       });}, icon: Icon(Icons.play_arrow,color: Colors.grey)),        
                        IconButton(onPressed: (){nextFun();
                        setState(() {
+                         isplaying=true;
                           sName=songList![intIndex].displayNameWOExt;
                           aName=songList![intIndex].artist!;
                                 });}, icon: Icon(Icons.skip_next,color: Colors.grey))              
@@ -419,80 +435,34 @@ slider(){ if((position.toString())==(duration.toString())&&(duration.toString()!
       Duration duration= Duration(seconds: seconds);
       player.seek(duration);
      }
-  notify(int index){
-     onselect?   AwesomeNotifications().createNotification(
-  content: NotificationContent(category: NotificationCategory.Transport,
-      id: 10,
-      channelKey: 'basic_channel',
-      title:songList![index].displayNameWOExt,
-      body:  songList![index].artist!,
-      actionType: ActionType.KeepOnTop,
-      notificationLayout: NotificationLayout.MediaPlayer,
-      backgroundColor: Colors.blue,
-      //icon: "resource://drawable/ic_launcher",
-      
-      largeIcon:  "resource://drawable/ic_launcher"
-  ),
-  actionButtons: [
-        NotificationActionButton(
-          showInCompactView:true,
-          key: "previous", 
-          label: "previous",
-          icon:"resource://drawable/pre",
-          color: Colors.purple,
-        ),
-        
-        NotificationActionButton(
-          showInCompactView:true,
-          key:!isplaying? "play":"pause", 
-          label: !isplaying? "play":"pause",
-          icon:isplaying?"resource://drawable/pause":"resource://drawable/play"
-          
-        ),
 
-        NotificationActionButton(
-          showInCompactView:true,
-          key: "next", 
-          label: "next",
-          icon: "resource://drawable/next",
-        )
-    ]
-):null;
-  }
 
 playerfun(int index){
-    // player.durationStream.listen((d) { 
-    //   setState(() {
-    //      Timer(Duration(seconds: 0), () {duration=d!;});
-    //   });
-    // });
-    //    player.positionStream.listen((p) {
-    //   setState(() {
-    //     position=p;
-    //   });
-    // });
+    player.durationStream.listen((d) { 
+      setState(() {
+         Timer(Duration(seconds: 0), () {duration=d!;});
+      });
+    });
+       player.positionStream.listen((p) {
+      setState(() {
+        position=p;
+      });
+    });
    
         try {
       player.setAudioSource(AudioSource.uri(Uri.parse((songList![index]).uri!)));
-      notify(index);
       player.play();
-      setState(() {
-        isplaying=true;
-      });
       } on Exception catch (e) {
         print("uri parse error");
       }
       }
     pausefun(){
       player.pause();
-      setState(() {
-        isplaying=false;
-      });
     }
     resfun(){
     //  player.()
     }
-nextFun() {
+  nextFun(){
     setState(() {
      if(-1<intIndex && intIndex<((songList!.length)-1)){ 
       intIndex=intIndex+1;
@@ -568,14 +538,14 @@ next() {
                     IconButton(onPressed: (){preFun();
                     }, icon: Icon(Icons.skip_previous_rounded,size: 50,color: Colors.grey)),
                     isplaying? IconButton(onPressed: (){pausefun();
-                    notify(intIndex);
-                  }, icon: Icon(Icons.pause,size: 50,color: Colors.grey))
+                    setState(() {
+                      isplaying=false;
+                    });}, icon: Icon(Icons.pause,size: 50,color: Colors.grey))
                     :IconButton(onPressed: (){playerfun(intIndex);
-                    notify(intIndex);
-                   }, icon: Icon(Icons.play_arrow,size: 50,color: Colors.grey)),
-                     IconButton(onPressed: (){nextFun();
-                  
-                     }, icon: Icon(Icons.skip_next_rounded,size: 50,color: Colors.grey)),
+                    setState(() {
+                      isplaying=true;
+                    });}, icon: Icon(Icons.play_arrow,size: 50,color: Colors.grey)),
+                     IconButton(onPressed: (){nextFun();}, icon: Icon(Icons.skip_next_rounded,size: 50,color: Colors.grey)),
                   ],
                 ),
               ),
