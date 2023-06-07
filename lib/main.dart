@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/player.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter_background/flutter_background.dart';
 
 void main() {
+  FlutterBackground.initialize();
   AwesomeNotifications().initialize(
     "resource://drawable/ic_launcher",
   // set the icon to null if you want to use the default app icon
@@ -16,7 +18,8 @@ void main() {
         channelName: 'Basic notifications',
         importance: NotificationImportance.Max,
         playSound: false,
-        onlyAlertOnce: true,
+        onlyAlertOnce: false,
+        criticalAlerts: false,
         enableVibration: false,
         channelDescription: 'Notification channel for basic tests',
         ledColor: Color.fromARGB(255, 79, 1, 42,)),

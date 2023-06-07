@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import "package:on_audio_query/on_audio_query.dart";
 import "package:permission_handler/permission_handler.dart";
 import 'package:awesome_notifications/awesome_notifications.dart';
-
+import 'package:flutter_background/flutter_background.dart';
 
 //sdbsdjvsjhjhhhhh
 //kjhkjh
@@ -70,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
  Duration position= const Duration();
  bool isSelected=false;
  int progress=0;
+ 
 
 @override
 void initState() {
@@ -460,21 +461,21 @@ slider(){ if((position.toString())==(duration.toString())&&(duration.toString()!
 ):null;
   }
 
-playerfun(int index){
-    // player.durationStream.listen((d) { 
-    //   setState(() {
-    //      Timer(Duration(seconds: 0), () {duration=d!;});
-    //   });
-    // });
-    //    player.positionStream.listen((p) {
-    //   setState(() {
-    //     position=p;
-    //   });
-    // });
+playerfun(int index){   notify(index);
+    player.durationStream.listen((d) { 
+      setState(() {
+         Timer(Duration(seconds: 0), () {duration=d!;});
+      });
+    });
+       player.positionStream.listen((p) {
+      setState(() {
+        position=p;
+      });
+    });
    
         try {
       player.setAudioSource(AudioSource.uri(Uri.parse((songList![index]).uri!)));
-      notify(index);
+   
       player.play();
       setState(() {
         isplaying=true;
