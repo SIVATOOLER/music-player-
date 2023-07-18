@@ -5,11 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:just_audio/just_audio.dart';
 import "package:on_audio_query/on_audio_query.dart";
 import "package:permission_handler/permission_handler.dart";
-//import 'package:awesome_notifications/awesome_notifications.dart';
 
 
-//sdbsdjvsjhjhhhhh
-//kjhkjh
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -37,8 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
 @override
 void initState() {
   initialize();
-  super.initState();
-  
+  super.initState(); 
 }
 
 
@@ -165,24 +161,8 @@ onsearch(String search ){
       (BuildContext context ,index){
          return InkWell(
           onTap: () async {
-            // bool isallowed = await AwesomeNotifications().isNotificationAllowed();
-            // if(!isallowed){
-            //   AwesomeNotifications().requestPermissionToSendNotifications();
-            //   print("eeeeeeeeeeeeee");
-            // }
-            // else{
-            //   print("eeeeeerrrrrrrrrrr");
-            //   AwesomeNotifications().createNotification(content: 
-            //   NotificationContent(id: 123, channelKey: "basic",
-            //   title: sName,
-            //   body:isallowed? "fhhghghg":"fgcc"
-            //   )
-            //   );
-          
-            // }
             setState(() {
               onselect=true;
-             // bottomPage=false;
                intIndex=index;
               sName=songList![intIndex].displayNameWOExt;
               aName=songList![intIndex].artist!;
@@ -265,7 +245,6 @@ bottom(){
                               ),
                             ],
                           );},
-                          //uyfyffhfhg
                           
                         ),
                       ),
@@ -392,7 +371,6 @@ playerfun(int index){
       player.pause();
     }
     resfun(){
-    //  player.()
     }
   nextFun(){
     setState(() {
@@ -561,12 +539,7 @@ void scrollIndex(int intindex){
               });
             }
           ),
-          // PopupMenuButton(
-          //   itemBuilder: 
-          // (context){
-          //   return null;
-          // }
-          // )
+
         ]
       ),
 
